@@ -30,7 +30,13 @@ const missingPlaceIdErrorMsg = {
   },
 };
 
-router.get("/api/geocode", async ctx => {
+const missingAddressErrorMsg = {
+  error: {
+    message: "You need to send `address` as query parameter",
+  },
+};
+
+router.get("/api/reverse-geocode", async ctx => {
   const placeId = ctx.query.place_id;
 
   if (!placeId) {
@@ -53,6 +59,35 @@ router.get("/api/geocode", async ctx => {
   }
 
   await cacheSet(placeId, geoResp.json.results, DAY_IN_SEC).catch(
+    console.error
+  );
+
+  sendResult(ctx, geoResp.json.results);
+});
+
+router.get("/api/geocode", async ctx => {
+  const address = ctx.query.address.toLowerCase();
+
+  if (!address) {
+    return sendError(ctx, missingAddressErrorMsg);
+  }
+
+  const result = await cacheGet(address);
+
+  if (result) {
+    return sendResult(ctx, result);
+  }
+
+  let geoResp;
+  try {
+    geoResp = await gMapsClient
+      .geocode({ address })
+      .asPromise();
+  } catch (err) {
+    return sendError(ctx, err.json);
+  }
+
+  await cacheSet(address, geoResp.json.results, DAY_IN_SEC).catch(
     console.error
   );
 
