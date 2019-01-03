@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  rds:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GMAP_API_KEY: $GMAP_API_KEY
+      REDIS_HOST: redis
+    ports:
+      - 4040:3000
+
+  redis:
+    image: redis:alpine

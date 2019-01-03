@@ -4,7 +4,9 @@ const Router = require("koa-router");
 const GMaps = require("@google/maps");
 const Cache = require("cacheman-redis");
 
-const cache = new Cache();
+const cache = new Cache({
+  host: process.env.REDIS_HOST || "localhost",
+});
 
 const cacheGet = utils.promisify(cache.get.bind(cache));
 const cacheSet = utils.promisify(cache.set.bind(cache));
@@ -75,16 +77,15 @@ router.get("/api/geocode", async ctx => {
   const result = await cacheGet(address);
 
   if (result) {
+    console.log("Send cached result");
     return sendResult(ctx, result);
   }
 
   let geoResp;
   try {
-    geoResp = await gMapsClient
-      .geocode({ address })
-      .asPromise();
+    geoResp = await gMapsClient.geocode({ address }).asPromise();
   } catch (err) {
-    return sendError(ctx, err.json);
+    return sendError(ctx, typeof err === "string" ? err : err.json);
   }
 
   await cacheSet(address, geoResp.json.results, DAY_IN_SEC).catch(
@@ -113,7 +114,6 @@ function sendError(ctx, error) {
 }
 
 function sendResult(ctx, result) {
-  console.log("Send cached result");
   ctx.statusCode = 200;
   ctx.type = "json";
   ctx.body = {
