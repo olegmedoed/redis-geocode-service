@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@google/maps": "^0.5.5",
+    "@koa/cors": "^2.2.3",
     "cacheman-redis": "^2.0.0",
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",

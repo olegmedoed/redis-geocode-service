@@ -3,9 +3,13 @@ const Koa = require("koa");
 const Router = require("koa-router");
 const GMaps = require("@google/maps");
 const Cache = require("cacheman-redis");
+const Cors = require("@koa/cors");
 
 const cache = new Cache({
   host: process.env.REDIS_HOST || "localhost",
+});
+const cors = Cors({
+  origin: "*",
 });
 
 const cacheGet = utils.promisify(cache.get.bind(cache));
@@ -48,6 +52,7 @@ router.get("/api/reverse-geocode", async ctx => {
   const result = await cacheGet(placeId);
 
   if (result) {
+    console.log("Send cached result");
     return sendResult(ctx, result);
   }
 
@@ -64,6 +69,7 @@ router.get("/api/reverse-geocode", async ctx => {
     console.error
   );
 
+  console.log("Send non-cached result");
   sendResult(ctx, geoResp.json.results);
 });
 
@@ -92,9 +98,15 @@ router.get("/api/geocode", async ctx => {
     console.error
   );
 
+  console.log("Send non-cached result");
   sendResult(ctx, geoResp.json.results);
 });
 
+app.use(async (ctx, next) => {
+  await next();
+  console.log(ctx.url, ctx.statusCode, ctx.method, ctx.body);
+});
+app.use(cors);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
