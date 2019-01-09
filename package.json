@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start:dev": "nodemon src/index.js"
   },
   "dependencies": {
     "@google/maps": "^0.5.5",
@@ -12,9 +13,11 @@
     "cacheman-redis": "^2.0.0",
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "nodemon": "^1.18.9",
     "prettier": "^1.15.3"
   }
 }

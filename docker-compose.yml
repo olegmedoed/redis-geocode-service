@@ -5,11 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: ["yarn", "start:dev"]
     environment:
       GMAP_API_KEY: $GMAP_API_KEY
       REDIS_HOST: redis
     ports:
       - 4040:3000
+    volumes:
+      - "$PWD/src:/app/src"
 
   redis:
     image: redis:alpine
