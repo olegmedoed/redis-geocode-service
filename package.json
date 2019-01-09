@@ -13,6 +13,7 @@
     "cacheman-redis": "^2.0.0",
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",
+    "koa-router-json-schema": "^0.0.1",
     "redis": "^2.8.0",
     "uuid": "^3.3.2"
   },
